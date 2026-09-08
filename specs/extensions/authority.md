@@ -207,6 +207,11 @@ covers:
 B = SHA-256( "x402-mandate-binding/1\n" || UTF8( mandateDigest || "\n" || paymentId ) )
 ```
 
+The `mandateDigest` component in the preimage string MUST be the complete string
+as defined in §5, retaining its literal lowercase ASCII `"sha256:"` prefix
+(e.g. `sha256:445fed87...`, exactly 71 characters); implementations MUST NOT
+strip the prefix down to raw hex bytes or bare hex before concatenation.
+
 | Scheme | Slot | Encoding of B |
 |---|---|---|
 | EIP-3009 `transferWithAuthorization` | `nonce` (bytes32) | `0x` + lowerhex (lowercase) |
