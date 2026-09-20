@@ -260,7 +260,7 @@ static payment data is a deliberate choice.
 *(Deployment figures here, and the 1,971-name DNS census in the TXT section, are from
 independent measurements by [@meloliva14](https://github.com/meloliva14), published at
 [meloliva14/x402-measure](https://github.com/meloliva14/x402-measure); the 1,611-host /
-2,234-name ancestor-walk dataset is published separately at `conformance/ancestor-walk.json`.)*
+2,234-name ancestor-walk dataset (frame digest `sha256:25e61f5433b1…`) is published separately at `conformance/ancestor-walk.json`.)*
 
 ## The DNS TXT record
 
@@ -322,16 +322,14 @@ failure this extension exists to prevent:
 
 | observed | records | why it is not a record |
 |---|---|---|
-| `https://host/.well-known/x402` (bare URL) | 2 | no `v=`, no pointer token |
-| `v=x4021;descriptor=…;url=https://…` | 1 | conforms to **draft-jeftovic-x402-dns-discovery** §4, a different published draft |
-| `v=x4021;url=https://…` | 1 | conforms to **draft-jeftovic-x402-dns-discovery** §4, a different published draft |
-| `x402-manifest=https://…` | 1 | no `v=`; unrecognised pointer token |
-| `v=x402-1; wk=https://…` | 2 | **conforming** — one operator publishing at both apex and host |
+| `https://host/.well-known/x402` (bare URL) | 1 | no `v=`, no pointer token (`auor.io`) |
+| `v=x4021;descriptor=…;url=https://…` | 3 | conforms to **draft-jeftovic-x402-dns-discovery** §4, a different published draft (`api.posttosource.com`, `posttosource.com`, `api.telemost.io`) |
+| `x402-manifest=https://…` | 1 | no `v=`; unrecognised pointer token (`vibesprings.net`) |
+| `v=x402-1; wk=https://…` | 2 | **conforming** — one operator publishing at both apex and host (`sirenic.eu`, `api.sirenic.eu`) |
 
-⚠️ **2 of these 5 are not malformed — they conform to a different draft.**
+⚠️ **3 of these 5 are not malformed — they conform to a different draft.**
 `draft-jeftovic-x402-dns-discovery` §4 defines `version = "x4021"` as a literal and
-`url=` as its pointer, and one of the two records is that draft's own example with
-the domain substituted. So a consumer refusing them is not rejecting a malformed
+`url=` as its pointer, and these records follow that draft's grammar. So a consumer refusing them is not rejecting a malformed
 record — it is
 **declining to honour another specification's conforming publishers**, which is a
 spec-conflict decision and belongs to the working group rather than to this table.
