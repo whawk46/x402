@@ -378,7 +378,10 @@ the name terminates in the `UNRESOLVED` state.
 A resolver **MAY** emit non-semantic diagnostic logs or warnings upon encountering an
 ignored or unparseable record; because no resolution state or discovery manifest is
 derived from the ignored record, diagnostic telemetry does not constitute a
-conformance divergence.
+conformance divergence. Resolvers and indexers **SHOULD** emit machine-readable
+diagnostic reason tokens alongside `UNRESOLVED`:
+- `UNRESOLVED_NO_RECORD`: when no valid discovery record exists across the queried host or its eligible ancestors.
+- `RECORD_FOUND_DOES_NOT_NAME_HOST`: when an encountered ancestor discovery record terminates climbing without referencing the queried host.
 
 
 ## Resolution algorithm
@@ -437,6 +440,19 @@ having failed for `H` rather than attributing the ancestor's capability to it;
 the consumer **MUST NOT** resume or continue climbing past an encountered
 valid discovery record to higher ancestors. A manifest retrieved from `H` itself
 always applies to `H`.
+
+> **Conformance test cases (Ancestor termination vs continuation).**
+> Implementations **MUST** satisfy the following discriminators:
+> - **Case A (Terminal Shadowing):**
+>   - Host: `pay.foo.example.com` (`H`)
+>   - Intervening Ancestor: `foo.example.com` (`A1`) publishes a valid discovery record whose manifest does NOT reference `H`.
+>   - Higher Ancestor: `example.com` (`A2`) publishes a valid discovery record whose manifest references `H`.
+>   - *Outcome:* Discovery **FAILS** for `H` (`UNRESOLVED`, reason `RECORD_FOUND_DOES_NOT_NAME_HOST`). The consumer **MUST NOT** climb past `A1` to `A2`.
+> - **Case B (Unbroken Ancestor Walk):**
+>   - Host: `pay.foo.example.com` (`H`)
+>   - Intervening Ancestor: `foo.example.com` (`A1`) publishes no discovery record of either kind.
+>   - Higher Ancestor: `example.com` (`A2`) publishes a valid discovery record whose manifest references `H`.
+>   - *Outcome:* Discovery **SUCCEEDS** for `H` (the walk continues past `A1` and applies the manifest from `A2`).
 
 This rule deliberately avoids depending on a public suffix list: such a list is
 a mutable external dependency, and an error in it converts silently into a false
