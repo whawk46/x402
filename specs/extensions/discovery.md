@@ -435,14 +435,18 @@ referenced URL counts only when its own host is `A` or a subdomain of `A`. If
 the manifest does not reference `H`, the consumer **MUST** treat discovery as
 having failed for `H` rather than attributing the ancestor's capability to it;
 the consumer **MUST NOT** resume or continue climbing past an encountered
-discovery record to higher ancestors. A manifest retrieved from `H` itself
+valid discovery record to higher ancestors. A manifest retrieved from `H` itself
 always applies to `H`.
 
 This rule deliberately avoids depending on a public suffix list: such a list is
-a mutable external dependency, it disagrees with operational reality for
-privately delegated suffixes, and an error in it converts silently into a false
-claim that a host is discoverable. Requiring the zone operator to name the host
-is a positive statement by a party in a position to make it.
+a mutable external dependency, and an error in it converts silently into a false
+claim that a host is discoverable. Instead, the rule trades that external dependency
+for a narrower failure mode at privately delegated boundaries (where an intervening
+ancestor's silence terminates climbing for a delegated subzone that published
+nothing of its own), avoiding recursive NS-set comparisons to keep discovery
+strictly bounded to TXT and HTTPS fetches. Requiring an ancestor manifest to
+name the host ensures capability attribution remains a positive statement by a
+party in a position to make it.
 
 > **Note for implementers.** That justification describes a *zone* operator, and
 > under a shared suffix the zone operator is not the host's operator. In a walk
