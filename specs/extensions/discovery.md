@@ -411,9 +411,10 @@ live `_x402` records on the network sat at names that were not themselves
 catalogued hosts** — reachable only by climbing.
 
 Consumers **MUST** query the resource host first, and **SHOULD** then query
-ancestor names, nearest first, stopping at the first name that yields a usable
-record. Implementations **SHOULD** bound this at two ancestors and **MUST NOT**
-query a name of fewer than two labels. The walk is **SHOULD** rather than MAY
+ancestor names, nearest first, stopping at the first name that yields a valid
+discovery record (a parseable `v=x402-1` TXT record whose manifest validates,
+or a validated manifest at `/.well-known/x402`). Implementations **SHOULD** bound
+this at two ancestors and **MUST NOT** query a name of fewer than two labels. The walk is **SHOULD** rather than MAY
 because two conforming consumers holding the same resource URL must not reach
 different answers about the same publisher — which is the failure this section
 opens by describing; a consumer that skips it is expected to have a reason (for
@@ -432,8 +433,10 @@ Accordingly, a manifest obtained from an ancestor name `A` applies to a host `H`
 references `H`**, in `facilitator.baseUrl` or in an entry of `resources`. A
 referenced URL counts only when its own host is `A` or a subdomain of `A`. If
 the manifest does not reference `H`, the consumer **MUST** treat discovery as
-having failed for `H` rather than attributing the ancestor's capability to it. A
-manifest retrieved from `H` itself always applies to `H`.
+having failed for `H` rather than attributing the ancestor's capability to it;
+the consumer **MUST NOT** resume or continue climbing past an encountered
+discovery record to higher ancestors. A manifest retrieved from `H` itself
+always applies to `H`.
 
 This rule deliberately avoids depending on a public suffix list: such a list is
 a mutable external dependency, it disagrees with operational reality for
