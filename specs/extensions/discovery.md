@@ -360,6 +360,17 @@ ships first. Until it is settled, a consumer following this document treats thos
 records as absent and falls through to the well-known path, which is the outcome
 that harms neither publisher.
 
+If an apex publishes only a legacy `v=x4021` record, the resolver **MUST** ignore
+the record and proceed immediately to Step 2 (HTTP `/.well-known/x402` fallback)
+exactly as if no DNS record were present. If no valid `.well-known` manifest exists,
+the name terminates in the `UNRESOLVED` state.
+
+A resolver **MAY** emit non-semantic diagnostic logs or warnings upon encountering an
+ignored or unparseable record; because no resolution state or discovery manifest is
+derived from the ignored record, diagnostic telemetry does not constitute a
+conformance divergence.
+
+
 ## Resolution algorithm
 
 ### Comparing host names
