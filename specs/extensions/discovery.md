@@ -163,6 +163,9 @@ name, so there is nothing to transfer.
 
 Rules:
 
+- An empty array (`"peers": []`) is well-formed and semantically equivalent
+  to omitting the field. It conveys no distinct assertion that the host
+  knows of no peers or acts as a terminal leaf.
 - A manifest MUST NOT list more than **32** peers. Consumers MUST ignore
   entries beyond the cap, and indexers SHOULD flag manifests that exceed it.
 - Entries MUST be bare DNS names. Consumers MUST ignore entries carrying a
@@ -226,6 +229,13 @@ asserted: the number that matters is **coverage** — the fraction of
 independently censused hosts a peer-crawl reaches from a single seed,
 checked against the census as ground truth. Entries-per-manifest is
 bookkeeping; coverage is whether the directory bootstrap is actually gone.
+Because Step 3 of the resolution algorithm mandates ignoring unknown fields,
+an implementation unaware of `peers` silently discards the array without an
+error surface, measuring a smaller graph. To ensure measurements are
+reproducible across different crawler implementations, any published
+coverage figure MUST report the crawler's known-field set (or spec revision);
+without this qualification, the number measures the crawler's schema
+awareness as much as the network graph.
 
 ### Migration
 
