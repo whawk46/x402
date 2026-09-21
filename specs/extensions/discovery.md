@@ -187,12 +187,12 @@ Rules:
   rather than the network.
 - "Registrable domain" SHOULD be judged against the public-suffix boundary,
   not by counting labels. The same census makes the failure concrete from the
-  other side: 394 of the 1,521 hosts sit directly under shared-platform
+  other side: 393 of the 1,521 hosts sit directly under shared-platform
   suffixes (`vercel.app` 202, `workers.dev` 72, `up.railway.app` 66,
-  `onrender.com` 27, and the rest across `fly.dev`, `replit.app`,
-  `netlify.app`, `a.run.app`, `sslip.io`, `nip.io`), where each name is a
+  `onrender.com` 27, and the remaining 26 across `fly.dev` 12, `replit.app` 4,
+  `netlify.app` 3, `a.run.app` 3, `sslip.io` 3, `nip.io` 1), where each name is a
   DIFFERENT operator deploying on a common platform. A last-two-labels rule
-  collapses those 394 operators into ten buckets and hands the most
+  collapses those 393 operators into ten buckets and hands the most
   operator-diverse quarter of the network one operator's crawl budget —
   inverting the diversity rule's intent. Consumers that do not carry a full
   Public Suffix List can satisfy this with a short static list of operator
@@ -358,8 +358,9 @@ For the same reason this extension does **not** alias `url=` to `wk=`. Every
 record above fails on `v=` as well, so an alias would convert no existing
 publisher while leaving two spellings in the grammar permanently.
 
-**The two `v=x4021` records are a different matter and this document does not
-settle it.** They are conforming publishers of `draft-jeftovic-x402-dns-discovery`,
+**The three `v=x4021` records across two publishing zones are a different matter and this document does not
+settle it.** (Two publishing zones publish three such names — `api.posttosource.com`, `posttosource.com`, and
+`api.telemost.io` — with the first two carrying byte-identical record bodies.) They are conforming publishers of `draft-jeftovic-x402-dns-discovery`,
 which reached the same primitive independently and earlier — a `_x402` TXT record
 pointing at an HTTPS manifest — with an incompatible spelling. Two drafts sharing
 a registered label and disagreeing on its grammar is a question for the working
