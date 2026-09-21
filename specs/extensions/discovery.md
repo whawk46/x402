@@ -210,9 +210,10 @@ Rules:
   Wildcard-DNS mappers (`sslip.io`, `nip.io`) belong on such lists for a
   different reason: every name under them resolves for whoever asks and
   there is no account level at all, so the operator-boundary test does not
-  apply — they are listed so each name stands alone. Ten boundaries cover
-  every platform host in the census today, at the cost of occasional
-  updates as new platforms appear in the wild.
+  apply — they are listed so each name stands alone. Twelve boundaries cover
+  every platform host in the census today (the ten primary platforms covering 393
+  hosts, plus `hf.space` 5 and `trycloudflare.com` 3 closing the 401 total), at
+  the cost of occasional updates as new platforms appear in the wild.
 
 Why this exists: with peer hints the network is crawlable from **any seed**.
 One known-good domain reaches its connected component with no directory, no
@@ -257,10 +258,7 @@ in the middle state, 188 were missing `asset` and 144 were missing `payTo`; for 
 deletion is both less work and less to keep correct. Complete the block only if serving
 static payment data is a deliberate choice.
 
-*(Deployment figures here, and the 1,971-name DNS census in the TXT section, are from
-independent measurements by [@meloliva14](https://github.com/meloliva14), published at
-[meloliva14/x402-measure](https://github.com/meloliva14/x402-measure); the 1,611-host /
-2,234-name ancestor-walk dataset (frame digest `sha256:25e61f5433b1…`) is published separately at `conformance/ancestor-walk.json`.)*
+*(The 260-host / 139-challenge figure in §2.1 is from unpublished operator telemetry; deployment figures for partial manifests and the 1,971-name DNS census in the TXT section are from independent measurements by [@meloliva14](https://github.com/meloliva14), published at [meloliva14/x402-measure](https://github.com/meloliva14/x402-measure); the 1,611-host / 2,234-name ancestor-walk dataset (frame digest `sha256:25e61f5433b1…`) is published separately at `conformance/ancestor-walk.json`.)*
 
 ## The DNS TXT record
 
