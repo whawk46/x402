@@ -187,14 +187,14 @@ Rules:
   rather than the network.
 - "Registrable domain" SHOULD be judged against the public-suffix boundary,
   not by counting labels. The same census makes the failure concrete from the
-  other side: 393 of the 1,521 hosts sit directly under shared-platform
-  suffixes (`vercel.app` 202, `workers.dev` 72, `up.railway.app` 66,
-  `onrender.com` 27, and the remaining 26 across `fly.dev` 12, `replit.app` 4,
-  `netlify.app` 3, `a.run.app` 3, `sslip.io` 3, `nip.io` 1), where each name is a
-  DIFFERENT operator deploying on a common platform. A last-two-labels rule
-  collapses those 393 operators into ten buckets and hands the most
-  operator-diverse quarter of the network one operator's crawl budget —
-  inverting the diversity rule's intent. Consumers that do not carry a full
+  other side: 401 of the 1,521 hosts sit directly under shared-platform
+  suffixes (393 across the ten primary platforms: `vercel.app` 202, `workers.dev` 72,
+  `up.railway.app` 66, `onrender.com` 27, and the remaining 26 across `fly.dev` 12,
+  `replit.app` 4, `netlify.app` 3, `a.run.app` 3, `sslip.io` 3, `nip.io` 1; plus
+  `hf.space` 5 and `trycloudflare.com` 3), where each name is a DIFFERENT operator
+  deploying on a common platform. A last-two-labels rule collapses those 401 operators
+  into twelve buckets and hands the most operator-diverse quarter of the network
+  one operator's crawl budget — inverting the diversity rule's intent. Consumers that do not carry a full
   Public Suffix List can satisfy this with a short static list of operator
   boundaries treated as public — with one care: each entry is the DEPTH at
   which a new operator begins, and that depth differs per platform. A
@@ -258,7 +258,7 @@ in the middle state, 188 were missing `asset` and 144 were missing `payTo`; for 
 deletion is both less work and less to keep correct. Complete the block only if serving
 static payment data is a deliberate choice.
 
-*(The 260-host / 139-challenge figure in §2.1 is from unpublished operator telemetry; deployment figures for partial manifests and the 1,971-name DNS census in the TXT section are from independent measurements by [@meloliva14](https://github.com/meloliva14), published at [meloliva14/x402-measure](https://github.com/meloliva14/x402-measure); the 1,611-host / 2,234-name ancestor-walk dataset (frame digest `sha256:25e61f5433b1…`) is published separately at `conformance/ancestor-walk.json`.)*
+*(The 260-host / 139-challenge figure in §2.1 is from probe measurements by [@meloliva14](https://github.com/meloliva14) reported in [#2979 (comment)](https://github.com/x402-foundation/x402/pull/2979#issuecomment-5199553316); deployment figures for partial manifests and the 1,971-name DNS census in the TXT section are from independent measurements by [@meloliva14](https://github.com/meloliva14), published at [meloliva14/x402-measure](https://github.com/meloliva14/x402-measure); the 1,611-host / 2,234-name ancestor-walk dataset (frame digest `sha256:25e61f5433b1…`) is published separately at `conformance/ancestor-walk.json`.)*
 
 ## The DNS TXT record
 
