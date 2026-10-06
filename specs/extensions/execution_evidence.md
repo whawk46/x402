@@ -139,7 +139,7 @@ Upon successful settlement and resource generation, the resource server delivers
 ### Header Syntax
 
 ```http
-x402-Execution-Evidence: uri="x402ev/1:sha256:7f83b165...#scitt=entry_94821"; digest="sha256:4a8b7f2d..."; sig="base64url:..."
+x402-Execution-Evidence: uri="x402ev/1:sha256:de717d35f610e929f3b0a3e994aa8ea6aee27323f5bca3ee8156c243cbebe37c#scitt=entry_94821"; digest="sha256:cf819dc86288a4bf3362749bdd3c879b4bc3342fc17f61401dd5700d94eb9e71"; sig="base64url:3RXnMPbBmkjiOIqZ1FK4JV0iYkFze40WytG92yfiFcolgOzSMvvfqVeoJ_j2ILBOhcKERN45OoaM8s4EXLFbAw"
 ```
 
 ### Response Extension Object Shape
@@ -149,36 +149,36 @@ x402-Execution-Evidence: uri="x402ev/1:sha256:7f83b165...#scitt=entry_94821"; di
   "extensions": {
     "execution-evidence": {
       "info": {
-        "evidenceRef": "x402ev/1:sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+        "evidenceRef": "x402ev/1:sha256:de717d35f610e929f3b0a3e994aa8ea6aee27323f5bca3ee8156c243cbebe37c",
         "scheme": "x402ev/1",
         "canonicalization": "RFC8785",
         "payment": {
           "network": "eip155:8453",
-          "txHash": "0x7a2c1b9d4e8f...",
-          "payer": "0x1234...abcd",
-          "payee": "0x5678...ef01",
-          "amount": "1000000",
-          "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
-          "fingerprint": "sha256:b563131f6eaaa6d7716b230a8cb52323ae619f88f2b69344d42d2667d3e6eb1e"
+          "txHash": "0x4a17c7e97752304fa5e2f9e76a830f75809f7d3a40b9d5e5d36c05dc7ce2decb",
+          "payer": "0x857b06519e91e3a54538791bdbb0e22373e36b66",
+          "payee": "0x209693bc6afc0c5328ba36faf03c514ef312287c",
+          "amount": "10000",
+          "asset": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+          "fingerprint": "sha256:15b452a978bae548c6ef71d40cc8824fe27bf01c2070fbd37bae6db83fc6ad53"
         },
         "request": {
           "method": "POST",
-          "urlHash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-          "payloadHash": "sha256:b5a2c6d8e0f1...",
+          "urlHash": "sha256:99913a6ff6cac19a02e7d9658195888603fabf33187f64009e9bb4afaad4604c",
+          "payloadHash": "sha256:631919ab262b217a40a4efd6e32560dbeaf5390a791e1763541546dafa0adc7a",
           "clientNonce": "d9f8c4e2a1b073e5",
           "timestamp": 1791024000
         },
         "delivery": {
           "statusCode": 200,
-          "contentDigest": "sha256:4a8b7f2d1e9c8b3a7f0e2d4c6b8a1e3f5d7c9b1a3e5f7d9c1b3a5f7d9c1b3a5f",
+          "contentDigest": "sha256:cf819dc86288a4bf3362749bdd3c879b4bc3342fc17f61401dd5700d94eb9e71",
           "contentType": "application/json",
           "latencyMs": 42,
           "timestamp": 1791024001
         },
         "signer": {
           "keyType": "Ed25519",
-          "publicKey": "0xabcd...1234",
-          "signature": "base64url:MEQCIG..."
+          "publicKey": "A6EHv_POEL4dcN0Y50vAmWfk1jCbpQ1fHdyGZBJVMbg",
+          "signature": "base64url:3RXnMPbBmkjiOIqZ1FK4JV0iYkFze40WytG92yfiFcolgOzSMvvfqVeoJ_j2ILBOhcKERN45OoaM8s4EXLFbAw"
         },
         "transparency": {
           "logId": "https://scitt.example.org",
@@ -225,26 +225,20 @@ x402-Execution-Evidence: uri="x402ev/1:sha256:7f83b165...#scitt=entry_94821"; di
 To eliminate circular references and ensure evidence references and signatures remain deterministic and stable across the entire receipt lifecycle (including post-issuance transparency log anchoring), all digests and signatures are computed over the canonical **receipt body**:
 
 1. **Receipt Body Definition (`body`)**:
-   The `body` object is constructed from the receipt `info` object by omitting:
-   - `evidenceRef` (self-referential);
-   - `signer.signature` (the cryptographic signature over the body; `signer.keyType` and `signer.publicKey` remain in `body`);
-   - `transparency` (log inclusion proof attached post-issuance).
+   `body` is the `execution-evidence` `info` object with exactly these members removed: `evidenceRef`, `signer.signature`, and `transparency`. Every other member, including the `signer` object without `signature`, is part of `body`.
 
    Formally:
    $$\text{body} = \text{info} \setminus \{\text{evidenceRef}, \;\text{signer.signature}, \;\text{transparency}\}$$
 
 2. **Evidence Reference Derivation (`evidenceRef`)**:
-   The canonical identifier names the *paid delivery event*, not merely the response body bytes. It is derived as:
-   $$\text{evidenceRef} = \text{"x402ev/1:sha256:"} + \text{hex}\big(\text{sha256}(\text{JCS}(\text{body}))\big)$$
-   where $\text{JCS}(\text{body})$ denotes the RFC 8785 JSON Canonicalization of `body`. Because `body` commits to payment parameters, client nonce, request hash, delivery metadata, and content digest, two distinct paid calls returning identical cached response bytes generate distinct, collision-free evidence references.
+   `evidenceRef` MUST equal `"x402ev/1:sha256:" + lowercase-hex(SHA-256(JCS(body)))`. It identifies one settlement-bound delivery record. It MUST NOT be derived from `delivery.contentDigest` alone: two paid calls that return identical bytes have equal `contentDigest`s and distinct `evidenceRef`s.
 
 3. **Signature Preimage**:
-   The resource server computes `signer.signature` over the canonical bytes of `body`:
+   `signer.signature` is over $\text{JCS}(\text{body})$. A verifier recomputes `body` and checks both `evidenceRef` and the signature against it. Attaching `transparency` after signing changes neither:
    $$\text{signature} = \text{Sign}_{K_{\text{server}}}\big(\text{JCS}(\text{body})\big)$$
-   Because `transparency` is excluded from `body`, attaching or updating a SCITT Merkle inclusion proof post-issuance preserves the receipt's `evidenceRef` and signature validity byte-for-byte.
 
-4. **Pre-Confirmation Payment Correlation (`payment.fingerprint`)**:
-   When the underlying settlement scheme supports normalized payment authorization hashing (such as `x402-payment-fingerprint/0` over EIP-3009 authorizations), the server MAY populate `payment.fingerprint`. This enables relying parties and audit lanes to join buyer records, seller records, delivery receipts, and acceptance records on a shared 32-byte key prior to on-chain transaction inclusion or during chain reorganizations.
+4. **Payment Correlation (Optional)**:
+   `payment.fingerprint`, when present, is `x402-payment-fingerprint/0` of the EIP-3009 authorization. It correlates records of one payment across buyer, seller, delivery receipt, and acceptance records; it does not establish settlement, which remains the `txHash` check in rule 3.
 
 ---
 
@@ -255,7 +249,7 @@ A client, auditor, or downstream reputation system MUST verify the execution evi
 1. **Canonical Schema & Signature Verification**:
    - Construct the receipt `body` from `info` by omitting `evidenceRef`, `signer.signature`, and `transparency`.
    - Compute $\text{JCS}(\text{body})$ using RFC 8785.
-   - Assert that `evidenceRef` equals $\text{"x402ev/1:sha256:"} + \text{hex}\big(\text{sha256}(\text{JCS}(\text{body}))\big)$.
+   - Assert that `evidenceRef` equals $\text{"x402ev/1:sha256:"} + \text{lowercase-hex}\big(\text{sha256}(\text{JCS}(\text{body}))\big)$.
    - Verify `signer.signature` over $\text{JCS}(\text{body})$ against the resource server's authorized public key. The authorization mechanism for the server's public key MUST be resolved via an explicit external trust input (such as DNS TXT key publication under `_x402key.<domain>`, a declared PKI certificate chain, or a pre-established origin key registry); the extension does not assume unauthenticated or self-asserted keys.
    - Assert that `payer` and `payee` are distinct non-null entities.
 
