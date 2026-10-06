@@ -2,14 +2,39 @@
 
 ## Summary
 
-The `execution-evidence` extension defines a canonical mechanism for cryptographically binding an on-chain x402 payment settlement to verified proof of digital resource delivery, compute execution, or AI model inference.
+The `execution-evidence` extension defines a canonical mechanism for cryptographically binding an on-chain x402 payment settlement to cryptographic evidence of digital resource delivery (content binding), counterparty-signed delivery receipts, and optional transparency log inclusion.
 
 While the base x402 specification authenticates and settles value transfer between a client and a resource server, it does not normatively bind the settled transaction to the fulfilled response payload. In autonomous machine-to-machine interactions where no human is in the loop to initiate traditional payment disputes, this gap introduces two systemic challenges:
 
 1. **Delivery Non-Repudiation**: A client cannot mathematically prove whether a paid resource server failed to deliver the promised payload or returned degraded/tampered data.
-2. **Economic Wash-Trading Defense**: Circular on-chain settlements between colluding wallets can generate artificial transaction volume on facilitator ledgers. Requiring verifiable execution evidence allows downstream reputation and auditing systems to differentiate authentic computational work from empty volume.
+2. **Economic Wash-Trading Bounding**: Circular on-chain settlements between colluding wallets can generate artificial transaction volume on facilitator ledgers. Requiring verifiable delivery evidence allows downstream reputation and auditing systems to differentiate attested delivery from unevidenced volume.
 
 This extension introduces canonical evidence reference identifiers (`x402ev/1`), canonical payload hashing (RFC 8785 JSON Canonicalization Scheme), counterparty-signed delivery receipts, and optional transparency log anchors (IETF SCITT / RFC 9162).
+
+### Claim Ceiling and Trust Boundaries
+
+The verification sequence defined in this extension establishes **settlement-bound delivery evidence and content integrity**; it proves that a resource server produced and signed a delivery claim over specific response bytes bound to a confirmed on-chain settlement transaction.
+
+Verification of `x402ev/1` does **not** by itself establish:
+- that claimed computation or AI inference was genuinely executed rather than served from cache, canned responses, or unverified processes;
+- that delivered payload bytes satisfy the client's offer acceptance or semantic correctness criteria;
+- that the delivery was independently witnessed or observed by third parties;
+- that the evidence is authoritative for downstream state transitions.
+
+Downstream systems MUST evaluate evidence within the explicit claim hierarchy:
+
+```
+OFFER_ACCEPTANCE_CRITERIA
+  -> x402ev/1 EVIDENCE BINDING
+    -> EVALUATION / RESOLUTION
+      -> AUTHORIZED TRANSITION
+```
+
+Or expressed as claim ceilings:
+
+`VALID_x402ev != CORRECT_DELIVERY != PROVEN_EXECUTION != AUTHORIZED_TRANSITION`
+
+Proving genuine compute execution (e.g., AI model inference correctness, model weight integrity, or tamper-proof silicon processing) requires an orthogonal execution-attestation primitive (such as hardware enclave / TEE attestation quotes with silicon measurement registers) layered alongside the delivery receipt.
 
 ---
 
@@ -188,7 +213,7 @@ A client, auditor, or downstream reputation system MUST verify the execution evi
 
 1. **Canonical Schema & Signature Verification**:
    - Canonicalize the receipt body using RFC 8785 (JSON Canonicalization Scheme).
-   - Verify the `signer.signature` against the resource server's authorized public key.
+   - Verify the `signer.signature` against the resource server's authorized public key. The authorization mechanism for the server's public key MUST be resolved via an explicit external trust input (such as DNS TXT key publication under `_x402key.<domain>`, a declared PKI certificate chain, or a pre-established origin key registry); the extension does not assume unauthenticated or self-asserted keys.
    - Assert that `payer` and `payee` are distinct non-null entities.
 
 2. **Delivery Content Integrity**:
@@ -209,4 +234,4 @@ A client, auditor, or downstream reputation system MUST verify the execution evi
 
 - **Privacy Preservation**: Raw request parameters and response bodies are never published in public ledgers or shared logs. Only SHA-256 digests are anchored, preserving data confidentiality for proprietary enterprise payloads and HIPAA/GDPR-sensitive prompts.
 - **Fail-Open Operational Model**: When requested as optional telemetry, evidence generation failure MUST NOT block delivery of the fulfilled digital resource.
-- **Sybil Resistance**: By requiring cryptographic binding between confirmed on-chain transaction hashes and distinct counterparty keys, this extension prevents zero-cost receipt manufacturing.
+- **Economic Cost Floor vs. Collusive Wash Trading**: Binding receipts to confirmed on-chain transactions between distinct payer and payee keys eliminates zero-cost receipt fabrication, establishing a deterministic economic floor (network transaction fees and settled capital lockup). However, confirmed on-chain settlement does not inherently prevent colluding wallets from wash trading. Downstream reputation, credit, and settlement systems MUST incorporate independent counterparty analysis and volume-weighting policies rather than treating valid `x402ev/1` receipts as definitive proof of non-collusive commercial activity.
