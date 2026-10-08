@@ -36,6 +36,8 @@ Or expressed as claim ceilings:
 
 An evaluation record that claims to evaluate a particular `x402ev/1` receipt MUST name it by `evidenceRef`: `evaluation.subject.evidenceRef == verified_receipt.evidenceRef`. That equality establishes subject identity only. `VALID_x402ev` does not imply `VALID_EVALUATION`, and neither implies `CORRECT_DELIVERY`: the evaluator's proof, key and criteria, and the correctness of the delivery, are each separate claims.
 
+*Informative*: A worked example of an evaluation record bound to an `x402ev/1` receipt by `evidenceRef`, built on this extension's own example receipt and including rejecting cases, is at https://github.com/babyblueviper1/preaction-governance-conformance/tree/5c7242878f8d105233a8f53248b52ee6499ac150/examples/x402ev-receipt-binding/evaluation-layer (pinned commit).
+
 Proving genuine compute execution (e.g., AI model inference correctness, model weight integrity, or tamper-proof silicon processing) requires an orthogonal execution-attestation primitive (such as hardware enclave / TEE attestation quotes with silicon measurement registers) layered alongside the delivery receipt.
 
 ---
